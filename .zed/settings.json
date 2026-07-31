@@ -1,0 +1,181 @@
+// hft-crypto - Zed project settings
+// Rust HFT cryptographic signing layer · 7 exchanges · ECDSA/Ed25519/HMAC
+// Mirrors rustfmt.toml and .clippy.toml conventions throughout.
+{
+    // ── Editor ──────────────────────────────────────────────────────────────────
+    "tab_size": 4,
+    "hard_tabs": false,
+    "preferred_line_length": 100,
+    "soft_wrap": "prefer_line",
+    "format_on_save": "on",
+    "formatter": "language_server",
+    // ── Inlay hints ─────────────────────────────────────────────────────────────
+    // Surfaces type annotations, parameter names, and lifetime labels inline —
+    // especially useful for the generic signing traits (ExchangeAuth, HmacCredentials).
+    "inlay_hints": {
+        "enabled": true,
+        "show_type_hints": true,
+        "show_parameter_hints": true,
+        "show_other_hints": true,
+        "edit_debounce_ms": 700,
+        "scroll_debounce_ms": 50
+    },
+    // ── File exclusions ─────────────────────────────────────────────────────────
+    // NOTE: "git" block is a global-only setting (rejected in project .zed/settings.json).
+    // Add inline blame config to ~/.config/zed/settings.json instead.
+    // Exclude Cargo build artefacts from the file tree and search.
+    "file_scan_exclusions": [
+        "**/.git",
+        "**/target",
+        "**/.DS_Store"
+    ],
+    // ── Rust language overrides ─────────────────────────────────────────────────
+    "languages": {
+        "Rust": {
+            "tab_size": 4,
+            "hard_tabs": false,
+            "preferred_line_length": 100,
+            "soft_wrap": "prefer_line",
+            "format_on_save": "on",
+            "formatter": "language_server",
+            // Show all inlay hints for ECDSA/Ed25519 generics and async chains
+            "inlay_hints": {
+                "enabled": true,
+                "show_type_hints": true,
+                "show_parameter_hints": true,
+                "show_other_hints": true
+            }
+        },
+        "TOML": {
+            "tab_size": 4,
+            "format_on_save": "on"
+        }
+    },
+    // ── rust-analyzer LSP ───────────────────────────────────────────────────────
+    "lsp": {
+        "rust-analyzer": {
+            "initialization_options": {
+                // Run clippy (not cargo check) on save to match [lints.clippy] in Cargo.toml.
+                // pedantic + all with the same allow-list as .clippy.toml.
+                "check": {
+                    "command": "clippy",
+                    "extraArgs": [
+                        // "--all-targets",
+                        "--",
+                        "-D",
+                        "warnings",
+                        "-A",
+                        "clippy::module_name_repetitions",
+                        "-A",
+                        "clippy::must_use_candidate",
+                        "-A",
+                        "clippy::missing_errors_doc"
+                    ]
+                },
+                // Cargo integration - keep features list empty by default so the
+                // default (no optional features) matches `cargo build` behaviour.
+                // Flip `allFeatures` to true when working on the ai-agent module.
+                "cargo": {
+                    "features": [],
+                    "allFeatures": false,
+                    "buildScripts": {
+                        "enable": true
+                    },
+                    // Dedicate a separate target directory so rust-analyzer rebuilds
+                    // don't invalidate the main build cache.
+                    "targetDir": "target/rust-analyzer"
+                },
+                // Procedural macros are used by rig-core's derive macros and
+                // serde::Deserialize / Serialize throughout the exchange layer.
+                "procMacro": {
+                    "enable": true
+                },
+                // Resolve `cfg(docsrs)` gates (see [package.metadata.docs.rs]).
+                "rustcSource": "discover",
+                // Auto-import support - essential when exploring exchange trait impls.
+                "completion": {
+                    "autoimport": {
+                        "enable": true
+                    },
+                    "autoself": {
+                        "enable": true
+                    },
+                    "postfix": {
+                        "enable": true
+                    }
+                },
+                // Experimental diagnostics surface lifetime and borrow issues earlier.
+                "diagnostics": {
+                    "enable": true,
+                    "experimental": {
+                        "enable": true
+                    },
+                    "warningsAsHint": [],
+                    "warningsAsInfo": []
+                },
+                // Hover docs - show full rustdoc for signing trait methods on hover.
+                "hover": {
+                    "documentation": {
+                        "enable": true,
+                        "keywords": {
+                            "enable": true
+                        }
+                    }
+                },
+                // Lens - inline "▶ Run" / "▶ Debug" / "▶ Test" buttons on each #[test].
+                "lens": {
+                    "enable": true,
+                    "run": {
+                        "enable": true
+                    },
+                    "debug": {
+                        "enable": true
+                    },
+                    "references": {
+                        "enable": true,
+                        "adt": {
+                            "enable": true
+                        },
+                        "trait": {
+                            "enable": true
+                        },
+                        "method": {
+                            "enable": true
+                        },
+                        "enumVariant": {
+                            "enable": true
+                        }
+                    }
+                },
+                // Semantic highlighting groups crypto primitives visually distinct
+                // from exchange adapter code.
+                "semanticHighlighting": {
+                    "strings": {
+                        "enable": true
+                    },
+                    "operator": {
+                        "specialization": {
+                            "enable": true
+                        }
+                    },
+                    "punctuation": {
+                        "enable": false
+                    }
+                }
+            }
+        }
+    },
+    // ── Integrated terminal ─────────────────────────────────────────────────────
+    // Inject the env vars that every cargo invocation in this project needs.
+    "terminal": {
+        "env": {
+            // Structured tracing for the hft_crypto crate at INFO level.
+            // Silence noisy deps (tokio, hyper, h2, etc.) unless DEBUG is requested.
+            "RUST_LOG": "hft_crypto=info",
+            // Full backtraces on panics - important when debugging async HFT paths.
+            "RUST_BACKTRACE": "1",
+            // Incremental compilation on by default for terminal cargo invocations.
+            "CARGO_INCREMENTAL": "1"
+        }
+    }
+}

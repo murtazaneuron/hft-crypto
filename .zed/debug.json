@@ -1,0 +1,294 @@
+// hft-crypto - Zed debugger configurations
+// Adapter: CodeLLDB (required for Rust - sourceLanguages is mandatory)
+//
+// All configs are DRY-RUN safe: exchange credentials are omitted by default
+// so no live orders can be accidentally placed during a debug session.
+//
+// Reference: https://zed.dev/docs/debugger
+[
+    // ── Binary: CLI subcommands ──────────────────────────────────────────────────
+    {
+        "label": "Debug - demo-all (default entrypoint)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/hft-crypto",
+        "args": [
+            "all"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    {
+        "label": "Debug - demo-crypto (ECDSA · Ed25519 · HMAC)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/hft-crypto",
+        "args": [
+            "crypto"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    {
+        "label": "Debug - demo-exchanges (7-exchange signed headers)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/hft-crypto",
+        "args": [
+            "exchanges"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    // ── AI-agent feature ────────────────────────────────────────────────────────
+    {
+        "label": "Debug - ai-agent feature (--features ai-agent)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build",
+                "--features",
+                "ai-agent"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/hft-crypto",
+        "args": [
+            "all"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug,rig_core=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+            // Set ANTHROPIC_API_KEY here or in your .env file when debugging live agent calls.
+            // "ANTHROPIC_API_KEY": "sk-ant-..."
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    // ── Release binary ──────────────────────────────────────────────────────────
+    // Strip-debuginfo is enabled in [profile.release], so backtraces are limited.
+    // Useful for benchmarking the signing hot-path with breakpoints on entry/exit.
+    {
+        "label": "Debug - release binary (demo-all)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build",
+                "--release"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/release/hft-crypto",
+        "args": [
+            "all"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    // ── Test binaries ───────────────────────────────────────────────────────────
+    // cargo test --no-run emits the test binary path to stderr; debug.json uses
+    // the conventional path cargo places it under target/debug/deps/.
+    // Tip: run `cargo test --no-run 2>&1 | grep "Executable"` to confirm the path.
+    {
+        "label": "Debug - crypto_tests (ECDSA · Ed25519 · HMAC unit tests)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "test",
+                "--test",
+                "crypto_tests",
+                "--no-run"
+            ]
+        },
+        // CodeLLDB attaches to the test binary - cargo places it in target/debug/deps/
+        // with a hash suffix.  Use a glob-friendly path or the exact binary from
+        // `cargo test --no-run 2>&1 | grep "Executable"`.
+        "program": "$ZED_WORKTREE_ROOT/target/debug/deps/crypto_tests",
+        "args": [
+            "--nocapture"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    {
+        "label": "Debug - exchange_auth_tests (all 7 adapters)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "test",
+                "--test",
+                "exchange_auth_tests",
+                "--no-run"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/deps/exchange_auth_tests",
+        "args": [
+            "--nocapture"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    {
+        "label": "Debug - Anthropic provider tests (live, requires API key)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "test",
+                "--test",
+                "providers",
+                "--features",
+                "ai-agent",
+                "--no-run"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/deps/providers",
+        "args": [
+            "--ignored",
+            "--test-threads=1",
+            "--nocapture"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug,rig_core=info",
+            "RUST_BACKTRACE": "1"
+            // "ANTHROPIC_API_KEY": "sk-ant-..."
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    // ── Examples ────────────────────────────────────────────────────────────────
+    {
+        "label": "Debug - example: crypto_demo",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build",
+                "--example",
+                "crypto_demo"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/examples/crypto_demo",
+        "args": [],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    {
+        "label": "Debug - example: exchange_demo (DRY-RUN)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build",
+                "--example",
+                "exchange_demo"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/examples/exchange_demo",
+        "args": [],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+    {
+        "label": "Debug - example: agent_demo (requires ANTHROPIC_API_KEY)",
+        "build": {
+            "command": "cargo",
+            "args": [
+                "build",
+                "--example",
+                "agent_demo",
+                "--features",
+                "ai-agent"
+            ]
+        },
+        "program": "$ZED_WORKTREE_ROOT/target/debug/examples/agent_demo",
+        "args": [],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug,rig_core=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+            // "ANTHROPIC_API_KEY": "sk-ant-..."
+        },
+        "sourceLanguages": [
+            "rust"
+        ],
+        "request": "launch",
+        "adapter": "CodeLLDB"
+    },
+]

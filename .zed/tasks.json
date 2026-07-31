@@ -1,0 +1,579 @@
+// hft-crypto - Zed task runner
+// Rust HFT cryptographic signing layer · 7 exchanges · ECDSA/Ed25519/HMAC
+//
+// Key: tasks are ordered from fastest (check/fmt) → slowest (release/doc),
+//      grouping exchange layer, crypto layer, and agent layer separately.
+[
+    // ── Quick feedback ─────────────────────────────────────────────────────────
+    {
+        "label": "check - all targets (fast)",
+        "command": "cargo",
+        "args": [
+            "check",
+            "--all-targets"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1",
+            "RUST_BACKTRACE": "short"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "check - ai-agent feature",
+        "command": "cargo",
+        "args": [
+            "check",
+            "--all-targets",
+            "--features",
+            "ai-agent"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1",
+            "RUST_BACKTRACE": "short"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    // ── Formatting ─────────────────────────────────────────────────────────────
+    {
+        "label": "fmt - format all (rustfmt edition=2024)",
+        "command": "cargo",
+        "args": [
+            "fmt",
+            "--all"
+        ],
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "fmt - check only (CI mode)",
+        "command": "cargo",
+        "args": [
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+        ],
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    // ══════════════════════════════════════════════════════════════════════════
+    // § DOCS
+    // ══════════════════════════════════════════════════════════════════════════
+    {
+        // Open rustdoc in the browser; includes private items for dev browsing.
+        "label": "doc · open (with private items)",
+        "command": "cargo",
+        "args": [
+            "doc",
+            "--open",
+            "--document-private-items"
+        ],
+        "tags": [
+            "doc"
+        ]
+    },
+    {
+        // Exact replica of the CI docs gate (RUSTDOCFLAGS injected via env).
+        "label": "doc · CI check  [RUSTDOCFLAGS=-D warnings]",
+        "command": "cargo",
+        "args": [
+            "doc",
+            "--no-deps"
+        ],
+        "env": {
+            "RUSTDOCFLAGS": "--cfg docsrs -D warnings"
+        },
+        "tags": [
+            "doc"
+        ]
+    },
+    // ── Linting ────────────────────────────────────────────────────────────────
+    {
+        "label": "clippy - no linting warnings)",
+        "command": "cargo",
+        "args": [
+            "clippy",
+            "--all-targets",
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "clippy - strict (all targets, -D warnings)",
+        "command": "cargo",
+        "args": [
+            "clippy",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings",
+            "-A",
+            "clippy::module_name_repetitions",
+            "-A",
+            "clippy::must_use_candidate",
+            "-A",
+            "clippy::missing_errors_doc"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "clippy - ai-agent feature (strict)",
+        "command": "cargo",
+        "args": [
+            "clippy",
+            "--all-targets",
+            "--features",
+            "ai-agent",
+            "--",
+            "-D",
+            "warnings",
+            "-A",
+            "clippy::module_name_repetitions",
+            "-A",
+            "clippy::must_use_candidate",
+            "-A",
+            "clippy::missing_errors_doc"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    // ── Build ──────────────────────────────────────────────────────────────────
+    {
+        "label": "build - dev",
+        "command": "cargo",
+        "args": [
+            "build"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "build - release (native CPU, LTO)",
+        "command": "cargo",
+        "args": [
+            "build",
+            "--release"
+        ],
+        "env": {
+            // Disable incremental for release - matches [profile.release] lto=true
+            "CARGO_INCREMENTAL": "0",
+            // native optimisations (AVX2 etc.) for the signing hot-path
+            "RUSTFLAGS": "-C target-cpu=native"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "build - ai-agent feature (dev)",
+        "command": "cargo",
+        "args": [
+            "build",
+            "--features",
+            "ai-agent"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "build - all features (docs.rs parity)",
+        "command": "cargo",
+        "args": [
+            "build",
+            "--all-features"
+        ],
+        "env": {
+            "CARGO_INCREMENTAL": "1",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    // ── Tests ──────────────────────────────────────────────────────────────────
+    {
+        "label": "test - all tests must pass",
+        "command": "cargo",
+        "args": [
+            "test",
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "test - workspace (8 threads)",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--workspace",
+            "--",
+            "--test-threads=8"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "test - workspace with stdout (--nocapture)",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--workspace",
+            "--",
+            "--nocapture",
+            "--test-threads=4"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    {
+        "label": "test - crypto primitives (ECDSA · Ed25519 · HMAC)",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--test",
+            "crypto_tests",
+            "--",
+            "--nocapture"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "test - 7-exchange auth adapters",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--test",
+            "exchange_auth_tests",
+            "--",
+            "--nocapture"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "test - Anthropic live provider (requires ANTHROPIC_API_KEY)",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--test",
+            "providers",
+            "--features",
+            "ai-agent",
+            "--",
+            "--ignored",
+            "--test-threads=1",
+            "--nocapture"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug,rig_core=info",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    {
+        "label": "test - ai-agent feature (unit tests only)",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--features",
+            "ai-agent",
+            "--",
+            "--test-threads=4"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    // ── Run - CLI subcommands ──────────────────────────────────────────────────
+    {
+        "label": "run - demo-all (default, DRY-RUN)",
+        "command": "cargo",
+        "args": [
+            "run",
+            "--",
+            "all"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    {
+        "label": "run - demo-crypto (ECDSA · Ed25519 · HMAC)",
+        "command": "cargo",
+        "args": [
+            "run",
+            "--",
+            "crypto"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    {
+        "label": "run - demo-exchanges (7-exchange signed requests)",
+        "command": "cargo",
+        "args": [
+            "run",
+            "--",
+            "exchanges"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    // ── Examples ──────────────────────────────────────────────────────────────
+    {
+        "label": "example - crypto_demo",
+        "command": "cargo",
+        "args": [
+            "run",
+            "--example",
+            "crypto_demo"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    {
+        "label": "example - exchange_demo (DRY-RUN)",
+        "command": "cargo",
+        "args": [
+            "run",
+            "--example",
+            "exchange_demo"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=debug",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    {
+        "label": "example - agent_demo (requires ANTHROPIC_API_KEY)",
+        "command": "cargo",
+        "args": [
+            "run",
+            "--example",
+            "agent_demo",
+            "--features",
+            "ai-agent"
+        ],
+        "env": {
+            "RUST_LOG": "hft_crypto=info,rig_core=info",
+            "RUST_BACKTRACE": "1",
+            "DRY_RUN": "true"
+        },
+        "allow_concurrent_runs": false,
+        "use_new_terminal": true,
+        "reveal": "always"
+    },
+    // ══ DOCS ════════════════════════════════════════════════════════════════
+    {
+        // Open public API docs in the browser (no private items, no deps).
+        "label": "doc: open",
+        "command": "cargo",
+        "args": [
+            "doc",
+            "--open",
+            "--no-deps"
+        ],
+        "cwd": "$ZED_WORKTREE_ROOT",
+        "reveal": "no_focus",
+        "tags": [
+            "docs"
+        ],
+    },
+    {
+        // Open docs including private items - useful when reading internals.
+        "label": "doc: open (private items)",
+        "command": "cargo",
+        "args": [
+            "doc",
+            "--open",
+            "--document-private-items",
+            "--no-deps"
+        ],
+        "cwd": "$ZED_WORKTREE_ROOT",
+        "reveal": "no_focus",
+        "tags": [
+            "docs"
+        ],
+    },
+    {
+        // CI doc build: injects --cfg docsrs and treats warnings as errors.
+        // Matches [package.metadata.docs.rs] rustdoc-args in Cargo.toml.
+        "label": "doc: CI check",
+        "command": "cargo",
+        "args": [
+            "doc",
+            "--no-deps"
+        ],
+        "cwd": "$ZED_WORKTREE_ROOT",
+        "env": {
+            "RUSTDOCFLAGS": "--cfg docsrs -D warnings"
+        },
+        "reveal": "always",
+        "tags": [
+            "docs",
+            "lint"
+        ],
+    },
+    // ── Maintenance ────────────────────────────────────────────────────────────
+    {
+        "label": "clean - full target directory",
+        "command": "cargo",
+        "args": [
+            "clean"
+        ],
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "clean - release profile only",
+        "command": "cargo",
+        "args": [
+            "clean",
+            "--release"
+        ],
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "update - Cargo.lock (dry run)",
+        "command": "cargo",
+        "args": [
+            "update",
+            "--dry-run"
+        ],
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "update - Cargo.lock (apply)",
+        "command": "cargo",
+        "args": [
+            "update"
+        ],
+        "allow_concurrent_runs": false,
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "cargo · publish (dry-run)",
+        // "type": "shell",
+        "command": "cargo",
+        "args": [
+            "publish",
+            "--dry-run"
+        ],
+        "tags": [
+            "cargo",
+            "publish"
+        ],
+        // "problemMatcher": [
+        //     "$rustc"
+        // ]
+    },
+    {
+        "label": "cargo · publish",
+        // "type": "shell",
+        "command": "cargo",
+        "args": [
+            "publish"
+        ],
+        "tags": [
+            "cargo",
+            "publish"
+        ],
+        // "problemMatcher": [
+        //     "$rustc"
+        // ]
+    }
+]

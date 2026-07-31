@@ -1,0 +1,76 @@
+[package]
+name = "hft-crypto"
+version = "0.3.5"
+edition = "2024"
+rust-version = "1.93.1"
+authors = ["Murtaza Ali Imtiaz <very.kool.king@gmail.com>"]
+description = "Cryptographic signing layer for high-frequency trading: ECDSA/Ed25519 forward-engineering + 7-exchange API authentication"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/murtazaai/hft-crypto"
+keywords = ["crypto", "defi", "ecdsa", "ed25519", "hft"]
+categories = ["algorithms", "cryptography", "finance"]
+readme = "README.md"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[[bin]]
+name = "hft-crypto"
+path = "src/main.rs"
+
+[dependencies]
+rig-core = { version = "^0.37", features = ["rustls"], optional = true }
+
+tokio = { version = "^1", features = ["full"] }
+
+ed25519-dalek = { version = "=2.1.1", features = ["rand_core"] }
+hmac = "^0.12"
+k256 = { version = "^0.13", features = ["arithmetic", "ecdsa", "sha256"] }
+sha2 = "^0.10"
+
+base64 = { version = "^0.22", features = ["std"] }
+hex = "^0.4"
+
+serde = { version = "^1", features = ["derive"] }
+serde_json = "^1"
+
+clap = { version = "=4.4.18", features = ["derive"] }
+
+tracing = "^0.1"
+tracing-subscriber = { version = "^0.3", features = ["env-filter", "fmt"] }
+
+anyhow = "^1"
+thiserror = "=1.0.69"
+
+chrono = { version = "^0.4", features = ["serde"] }
+
+rand = "^0.8"
+
+dotenvy = "^0.15"
+
+[dev-dependencies]
+pretty_assertions = "^1"
+tokio-test = "^0.4"
+
+[features]
+default = []
+ai-agent = ["dep:rig-core"]
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+missing_errors_doc = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+pedantic = { level = "warn", priority = -1 }
+
+[lints.rust]
+missing_docs = "warn"
+unused = "warn"
+
+[profile.release]
+opt-level = 3
+strip = "debuginfo"
+lto = true
+panic = "abort"
+codegen-units = 1
