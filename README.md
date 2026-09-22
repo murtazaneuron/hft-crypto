@@ -10,13 +10,13 @@ ECDSA / Ed25519 forward-engineering · 7-exchange API authentication · Rig (ARC
 [![rig-core](https://img.shields.io/badge/rig--core-0.37-purple)](https://rig.rs)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](LICENSE-MIT)
 
-> Built by **[Murtaza Ali Imtiaz](https://github.com/murtazaai)** · Technology Lead · **mAI (🧠)** · July 2019–Present
+> Built by **[Murtaza Ali Imtiaz](https://github.com/murtazaneuron)** · Technology Lead · **mAI (🧠)** · July 2019–Present
 
 ---
 
 ## Overview
 
-Repository for the [mAI (🧠)](https://github.com/murtazaai) HFT platform.
+Repository for the [mAI (🧠)](https://github.com/murtazaneuron) HFT platform.
 
 Forward-engineers **ECDSA (secp256k1)** and **Ed25519 (Curve25519)** from their mathematical
 specifications (FIPS 186-5, RFC 8032) and applies them to produce **authenticated REST API
@@ -89,7 +89,7 @@ Ed25519 is **deterministic** - no per-signature randomness, eliminating RNG side
 ## Quick Start
 
 ```bash
-git clone https://github.com/murtazaai/hft-crypto
+git clone https://github.com/murtazaneuron/hft-crypto
 cd hft-crypto
 cp .env.example .env
 # Optionally fill in exchange API keys for live mode
@@ -123,7 +123,7 @@ cargo run -- --help
 ### Setup
 
 ```text
-git clone https://github.com/murtazaai/hft-crypto
+git clone https://github.com/murtazaneuron/hft-crypto
 cd hft-crypto
 cp .env.example .env
 # Edit .env: ANTHROPIC_API_KEY=sk-ant-...  (optional, only for AI agent)
@@ -256,14 +256,14 @@ cargo run --example agent_demo --features ai-agent
 
 - [Architecture Diagram](./docs/architecture.md)
 - [DSA Forward-Engineering Math](./docs/dsa_math.md)
-- [hft-crypto Wiki](https://github.com/murtazaai/hft-crypto/wiki)
+- [hft-crypto Wiki](https://github.com/murtazaneuron/hft-crypto/wiki)
 
 
 | Repo | Description |
 |------|-------------|
-| [polar-bear-rig-hft](https://github.com/murtazaai/polar-bear-rig-hft) | rig-core HFT platform + AVM + Smart Order Routing |
-| [polar-bear-rig-onchain](https://github.com/murtazaai/polar-bear-rig-onchain) | rig-onchain-kit Solana/EVM + SignerContext |
-| [polar-bear-arc-forge-defi](https://github.com/murtazaai/polar-bear-arc-forge-defi) | ARC Forge + sniper-bot prevention |
+| [rig-hft](https://github.com/murtazaneuron/rig-hft) | rig-core HFT platform + AVM + Smart Order Routing |
+| [rig-onchain](https://github.com/murtazaneuron/rig-onchain) | rig-onchain-kit Solana/EVM + SignerContext |
+| [arc-forge-defi](https://github.com/murtazaneuron/arc-forge-defi) | ARC Forge + sniper-bot prevention |
 
 ---
 
@@ -295,6 +295,6 @@ Licensed under:
 
 **Murtaza Ali Imtiaz** · Technology Lead · **mAI (🧠)** · (July 2019 – Present)
 
-- GitHub: [@murtazaai](https://github.com/murtazaai)
+- GitHub: [@murtazaneuron](https://github.com/murtazaneuron)
 - LinkedIn: [linkedin.com/in/murtazai](https://linkedin.com/in/murtazai)
 - Portfolio: [murtazai.com](https://murtazai.com)
