@@ -261,8 +261,8 @@ cargo run --example agent_demo --features ai-agent
 
 | Repo | Description |
 |------|-------------|
-| [rig-hft](https://github.com/murtazaneuron/rig-hft) | rig-core HFT platform + AVM + Smart Order Routing |
-| [rig-onchain](https://github.com/murtazaneuron/rig-onchain) | rig-onchain-kit Solana/EVM + SignerContext |
+| [hft-core](https://github.com/murtazaneuron/hft-core) | HFT Core platform + AVM + Smart Order Routing |
+| [hft-onchain](https://github.com/murtazaneuron/hft-onchain) | hft-onchain-kit Solana/EVM + SignerContext |
 | [arc-forge-defi](https://github.com/murtazaneuron/arc-forge-defi) | ARC Forge + sniper-bot prevention |
 
 ---
@@ -282,7 +282,7 @@ cargo run --example agent_demo --features ai-agent
 ## License
 
 Proprietary - © 2026 Murtaza Ali Imtiaz / mAI (🧠)  
-See [LICENSE-PBS](LICENSE-PBS) for permitted use.
+See [LICENSE-PBS](LICENSE-MAI) for permitted use.
 
 Licensed under:
 
