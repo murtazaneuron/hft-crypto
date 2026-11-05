@@ -19,7 +19,7 @@
 ### Setup
 
 ```text
-git clone https://github.com/murtazaai/hft-crypto
+git clone https://github.com/murtazaneuron/hft-crypto
 cd hft-crypto
 cp .env.example .env
 # Edit .env: set ANTHROPIC_API_KEY=sk-ant-... (only needed for ai-agent feature)
